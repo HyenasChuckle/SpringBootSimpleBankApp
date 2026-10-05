@@ -32,6 +32,7 @@ public class CustomerService {
         return toCustomerResponseDTO(customer);
     }
 
+    // Update customer in database.
     @Transactional
     public CustomerResponseDTO update(UpdateCustomerDTO updateCustomerDTO, String username) {
         Customer customer = customerRepository.findByUsername(username).orElseThrow(
@@ -45,6 +46,16 @@ public class CustomerService {
             customer.setPassword(passwordEncoder.encode(updateCustomerDTO.password()));
 
         return toCustomerResponseDTO(customerRepository.save(customer));
+    }
+
+    // Delete user from database.
+    @Transactional
+    public void delete(String username) {
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("user not found")
+        );
+
+        customerRepository.delete(customer);
     }
 
     // DTO mapping methods

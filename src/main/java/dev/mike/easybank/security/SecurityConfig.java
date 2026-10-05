@@ -24,8 +24,8 @@ public class SecurityConfig {
         http.httpBasic(Customizer.withDefaults());
 
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.PUT, "/api/customers").authenticated()
-                .anyRequest().permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/customers").permitAll()
+                .anyRequest().authenticated()
         );
 
         return http.build();

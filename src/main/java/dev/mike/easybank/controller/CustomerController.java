@@ -26,12 +26,20 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
 
-    // Updating existing customer.
+    // Updating existing (currently signed in) customer.
     @PutMapping
     public ResponseEntity<CustomerResponseDTO> updateCustomer(@RequestBody UpdateCustomerDTO updateCustomerDTO,
                                                               Principal principal) {
         CustomerResponseDTO customerResponseDTO = customerService.update(updateCustomerDTO, principal.getName());
 
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
+
+    // Delete existing (currently signed in) customer.
+    @DeleteMapping
+    public ResponseEntity<Void> deleteCustomer(Principal principal) {
+        customerService.delete(principal.getName());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }
