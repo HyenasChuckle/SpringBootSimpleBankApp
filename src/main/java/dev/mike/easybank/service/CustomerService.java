@@ -1,0 +1,74 @@
+package dev.mike.easybank.service;
+
+import dev.mike.easybank.dto.CustomerResponseDTO;
+import dev.mike.easybank.dto.RegisterCustomerDTO;
+import dev.mike.easybank.dto.UpdateCustomerDTO;
+import dev.mike.easybank.entity.Account;
+import dev.mike.easybank.entity.Customer;
+import dev.mike.easybank.repository.CustomerRepository;
+import dev.mike.easybank.util.AccountNumberGenerator;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+@Service
+@RequiredArgsConstructor
+public class CustomerService {
+
+    private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AccountNumberGenerator accountNumberGenerator;
+
+    // Saving new customer in database.
+    @Transactional
+    public CustomerResponseDTO create(RegisterCustomerDTO registerCustomerDTO) {
+        Customer customer = toCustomer(registerCustomerDTO);
+        customerRepository.save(customer);
+
+        return toCustomerResponseDTO(customer);
+    }
+
+    @Transactional
+    public CustomerResponseDTO update(UpdateCustomerDTO updateCustomerDTO, String username) {
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("user not found")
+        );
+
+        if (updateCustomerDTO.username() != null && !updateCustomerDTO.username().isBlank())
+            customer.setUsername(updateCustomerDTO.username());
+
+        if (updateCustomerDTO.password() != null && !updateCustomerDTO.password().isBlank())
+            customer.setPassword(passwordEncoder.encode(updateCustomerDTO.password()));
+
+        return toCustomerResponseDTO(customerRepository.save(customer));
+    }
+
+    // DTO mapping methods
+    private Customer toCustomer(RegisterCustomerDTO registerCustomerDTO) {
+        String encodedPassword = passwordEncoder.encode(registerCustomerDTO.password());
+
+        Customer customer = Customer
+                .builder()
+                .username(registerCustomerDTO.username())
+                .password(encodedPassword)
+                .build();
+
+        Account account = Account
+                .builder()
+                .number(accountNumberGenerator.generateAccountNumber())
+                .balance(BigDecimal.ZERO)
+                .build();
+
+        customer.addAccount(account);
+
+        return customer;
+    }
+
+    private CustomerResponseDTO toCustomerResponseDTO(Customer customer) {
+        return new CustomerResponseDTO(customer.getUsername());
+    }
+}

@@ -1,14 +1,23 @@
 package dev.mike.easybank.entity;
 
 import dev.mike.easybank.entity.enums.AuthorityType;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "customers")
-public class Customer {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Customer implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +32,26 @@ public class Customer {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(name = "authority_type")
-    private Set<AuthorityType> authorities;
+    @Builder.Default
+    private Set<AuthorityType> authorities = new HashSet<>(Set.of(AuthorityType.USER));
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, orphanRemoval = true,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Account> accounts;
+    @Builder.Default
+    private List<Account> accounts = new ArrayList<>();
+
+    @Override
+    @Nonnull
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities
+                .stream()
+                .map(authorityType -> new SimpleGrantedAuthority(authorityType.name()))
+                .toList();
+    }
+
+    // Convenience methods
+    public void addAccount(Account account) {
+        accounts.add(account);
+        account.setOwner(this);
+    }
 }
