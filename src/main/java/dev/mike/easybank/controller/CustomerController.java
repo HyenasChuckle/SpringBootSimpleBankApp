@@ -1,8 +1,8 @@
 package dev.mike.easybank.controller;
 
-import dev.mike.easybank.dto.CustomerResponseDTO;
-import dev.mike.easybank.dto.RegisterCustomerDTO;
-import dev.mike.easybank.dto.UpdateCustomerDTO;
+import dev.mike.easybank.dto.customer.CustomerResponseDTO;
+import dev.mike.easybank.dto.customer.CustomerSignUpDTO;
+import dev.mike.easybank.dto.customer.UpdateCustomerDTO;
 import dev.mike.easybank.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class CustomerController {
 
     // Creating new customer.
     @PostMapping
-    public ResponseEntity<CustomerResponseDTO> registerCustomer(@RequestBody RegisterCustomerDTO registerCustomerDTO) {
-        CustomerResponseDTO customerResponseDTO = customerService.create(registerCustomerDTO);
+    public ResponseEntity<CustomerResponseDTO> registerCustomer(@RequestBody CustomerSignUpDTO customerSignUpDTO) {
+        CustomerResponseDTO customerResponseDTO = customerService.create(customerSignUpDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }

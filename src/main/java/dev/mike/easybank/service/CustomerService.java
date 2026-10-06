@@ -1,8 +1,8 @@
 package dev.mike.easybank.service;
 
-import dev.mike.easybank.dto.CustomerResponseDTO;
-import dev.mike.easybank.dto.RegisterCustomerDTO;
-import dev.mike.easybank.dto.UpdateCustomerDTO;
+import dev.mike.easybank.dto.customer.CustomerResponseDTO;
+import dev.mike.easybank.dto.customer.CustomerSignUpDTO;
+import dev.mike.easybank.dto.customer.UpdateCustomerDTO;
 import dev.mike.easybank.entity.Account;
 import dev.mike.easybank.entity.Customer;
 import dev.mike.easybank.repository.CustomerRepository;
@@ -25,8 +25,8 @@ public class CustomerService {
 
     // Saving new customer in database.
     @Transactional
-    public CustomerResponseDTO create(RegisterCustomerDTO registerCustomerDTO) {
-        Customer customer = toCustomer(registerCustomerDTO);
+    public CustomerResponseDTO create(CustomerSignUpDTO customerSignUpDTO) {
+        Customer customer = toCustomer(customerSignUpDTO);
         customerRepository.save(customer);
 
         return toCustomerResponseDTO(customer);
@@ -59,12 +59,12 @@ public class CustomerService {
     }
 
     // DTO mapping methods
-    private Customer toCustomer(RegisterCustomerDTO registerCustomerDTO) {
-        String encodedPassword = passwordEncoder.encode(registerCustomerDTO.password());
+    private Customer toCustomer(CustomerSignUpDTO customerSignUpDTO) {
+        String encodedPassword = passwordEncoder.encode(customerSignUpDTO.password());
 
         Customer customer = Customer
                 .builder()
-                .username(registerCustomerDTO.username())
+                .username(customerSignUpDTO.username())
                 .password(encodedPassword)
                 .build();
 

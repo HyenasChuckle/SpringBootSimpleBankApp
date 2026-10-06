@@ -18,6 +18,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    // Create new account.
     @PostMapping
     public ResponseEntity<AccountResponseDTO> createAccount(Principal principal) {
         String username = principal.getName();

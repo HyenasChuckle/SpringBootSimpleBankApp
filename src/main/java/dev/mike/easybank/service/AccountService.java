@@ -3,7 +3,6 @@ package dev.mike.easybank.service;
 import dev.mike.easybank.dto.account.AccountResponseDTO;
 import dev.mike.easybank.entity.Account;
 import dev.mike.easybank.entity.Customer;
-import dev.mike.easybank.repository.AccountRepository;
 import dev.mike.easybank.repository.CustomerRepository;
 import dev.mike.easybank.util.AccountNumberGenerator;
 import jakarta.transaction.Transactional;
@@ -17,7 +16,6 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
     private final AccountNumberGenerator accountNumberGenerator ;
 
@@ -36,7 +34,8 @@ public class AccountService {
 
         customer.addAccount(account);
 
-        return toAccountResponseDTO(accountRepository.save(account));
+        // No need of using accountRepository.save(account) due to '@Transactional'.
+        return toAccountResponseDTO(account);
     }
 
     // Mapping methods.

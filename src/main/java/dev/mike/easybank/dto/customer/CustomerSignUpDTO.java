@@ -1,8 +1,8 @@
-package dev.mike.easybank.dto;
+package dev.mike.easybank.dto.customer;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record RegisterCustomerDTO(
+public record CustomerSignUpDTO(
         @NotBlank(message = "username is required")
         String username,
 

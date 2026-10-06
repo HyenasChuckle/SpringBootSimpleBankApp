@@ -32,4 +32,9 @@ public class Account {
     @OneToMany(mappedBy = "senderAccount", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<Transaction> transactions = new ArrayList<>();
+
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        transaction.setSenderAccount(this);
+    }
 }
