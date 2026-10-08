@@ -1,6 +1,6 @@
 package dev.mike.eazybankz.dto.customer;
 
-public record CustomerResponseDTO(
+public record CustomerResponseDto(
         String email,
         String firstName,
         String lastName) {}

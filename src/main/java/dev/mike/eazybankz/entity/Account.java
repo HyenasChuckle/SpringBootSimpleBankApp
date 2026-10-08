@@ -1,5 +1,6 @@
 package dev.mike.eazybankz.entity;
 
+import dev.mike.eazybankz.entity.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,13 +18,17 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name ="iban", unique = true, nullable = false)
-    private String IBAN;
+    @Column(unique = true, nullable = false)
+    private String number;
 
-    @Column(name ="current_balance", nullable = false)
-    private BigDecimal currentBalance;
+    @Column(nullable = false)
+    private BigDecimal balance;
 
     @ManyToOne
-    @JoinColumn(name ="account_owner_id", nullable = false)
-    private Customer accountOwner;
+    @JoinColumn(nullable = false)
+    private Customer owner;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountType type;
 }

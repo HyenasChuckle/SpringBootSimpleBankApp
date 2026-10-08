@@ -29,10 +29,6 @@ public class Customer implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
-    @OneToMany(mappedBy = "accountOwner", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Builder.Default
-    private List<Account> accounts = new ArrayList<>();
-
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -68,21 +64,5 @@ public class Customer implements UserDetails {
     @Override
     public boolean isEnabled() {
         return status.equals(Status.ACTIVE);
-    }
-
-    // Convenience methods.
-    public void addAccount(Account account) {
-        if (accounts == null)
-            accounts = new ArrayList<>();
-
-        accounts.add(account);
-        account.setAccountOwner(this);
-    }
-
-    public void addAuthority(AuthorityType type) {
-        if (authorities == null)
-            authorities = new HashSet<>();
-
-        authorities.add(type);
     }
 }

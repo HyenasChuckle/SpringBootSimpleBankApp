@@ -2,7 +2,7 @@ package dev.mike.eazybankz.dto.customer;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CustomerSignUpDTO(
+public record CustomerSignUpDto(
         @NotBlank(message = "first name is required")
         String firstName,
 

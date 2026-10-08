@@ -1,8 +1,10 @@
 package dev.mike.eazybankz.service;
 
-import dev.mike.eazybankz.dto.account.AccountResponseDTO;
+import dev.mike.eazybankz.dto.account.AccountResponseDto;
 import dev.mike.eazybankz.entity.Account;
+import dev.mike.eazybankz.entity.enums.AccountType;
 import dev.mike.eazybankz.entity.Customer;
+import dev.mike.eazybankz.repository.AccountRepository;
 import dev.mike.eazybankz.repository.CustomerRepository;
 import dev.mike.eazybankz.util.AccountNumberGenerator;
 import jakarta.transaction.Transactional;
@@ -16,26 +18,29 @@ import java.math.BigDecimal;
 public class AccountService {
 
     private final CustomerRepository customerRepository;
+    private final AccountRepository accountRepository;
     private final AccountNumberGenerator accountNumberGenerator ;
 
     @Transactional
-    public AccountResponseDTO create(String email) {
+    public AccountResponseDto create(String email) {
         Customer customer = customerRepository.findByEmail(email).orElseThrow(
                 () -> new RuntimeException(String.format("Customer with email %s not found.", email))
         );
 
-        Account account = Account
-                .builder()
-                .IBAN(accountNumberGenerator.generateAccountNumber())
-                .currentBalance(BigDecimal.ZERO)
+        Account account = Account.builder()
+                .number(accountNumberGenerator.generateAccountNumber())
+                .balance(BigDecimal.ZERO)
+                .owner(customer)
+                .type(AccountType.SAVINGS)
                 .build();
 
-        customer.addAccount(account);
-
-        return toAccountResponseDTO(account);
+        return toAccountResponseDTO(accountRepository.save(account));
     }
 
-    private AccountResponseDTO toAccountResponseDTO(Account account) {
-        return new AccountResponseDTO(account.getIBAN());
+    private AccountResponseDto toAccountResponseDTO(Account account) {
+        return new AccountResponseDto(
+                account.getNumber(),
+                account.getBalance()
+        );
     }
 }

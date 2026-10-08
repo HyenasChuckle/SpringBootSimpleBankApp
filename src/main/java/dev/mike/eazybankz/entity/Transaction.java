@@ -19,20 +19,20 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "receiver_iban", nullable = false)
-    private String receiverIBAN;
+    @Column(nullable = false)
+    private String receiverNumber;
 
     @ManyToOne
-    @JoinColumn(name = "source_account_id", nullable = false)
-    private Account sourceAccount;
+    @JoinColumn(nullable = false)
+    private Account source;
 
-    @Column(name = "transaction_amount", nullable = false)
-    private BigDecimal transactionAmount;
+    @Column(nullable = false)
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_type", nullable = false)
-    private TransactionType transactionType;
+    @Column(nullable = false)
+    private TransactionType type;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 }

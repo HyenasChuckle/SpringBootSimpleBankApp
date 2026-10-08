@@ -1,11 +1,13 @@
 package dev.mike.eazybankz.service;
 
-import dev.mike.eazybankz.dto.customer.CustomerResponseDTO;
-import dev.mike.eazybankz.dto.customer.CustomerSignUpDTO;
-import dev.mike.eazybankz.dto.customer.CustomerUpdateDTO;
+import dev.mike.eazybankz.dto.customer.CustomerResponseDto;
+import dev.mike.eazybankz.dto.customer.CustomerSignUpDto;
+import dev.mike.eazybankz.dto.customer.CustomerUpdateDto;
 import dev.mike.eazybankz.entity.Account;
+import dev.mike.eazybankz.entity.enums.AccountType;
 import dev.mike.eazybankz.entity.Customer;
 import dev.mike.eazybankz.entity.enums.Status;
+import dev.mike.eazybankz.repository.AccountRepository;
 import dev.mike.eazybankz.repository.CustomerRepository;
 import dev.mike.eazybankz.util.AccountNumberGenerator;
 import jakarta.transaction.Transactional;
@@ -20,12 +22,13 @@ import java.math.BigDecimal;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountNumberGenerator accountNumberGenerator;
 
     // CRUD - Create
     @Transactional
-    public CustomerResponseDTO create(CustomerSignUpDTO dto) {
+    public CustomerResponseDto create(CustomerSignUpDto dto) {
         if (customerRepository.existsByEmail(dto.email()))
             throw new RuntimeException("This email is not available.");
 
@@ -33,7 +36,7 @@ public class CustomerService {
     }
 
     // CRUD - Read
-    public CustomerResponseDTO findByEmail(String email) {
+    public CustomerResponseDto findByEmail(String email) {
         Customer customer = fetchCustomer(email);
 
         return toCustomerResponseDTO(customer);
@@ -41,7 +44,7 @@ public class CustomerService {
 
     // CRUD - Update
     @Transactional
-    public CustomerResponseDTO update(CustomerUpdateDTO dto, String email) {
+    public CustomerResponseDto update(CustomerUpdateDto dto, String email) {
         Customer customer = fetchCustomer(email);
 
         if (!customer.getStatus().equals(Status.ACTIVE))
@@ -75,38 +78,37 @@ public class CustomerService {
         customer.setStatus(Status.DEACTIVATED);
     }
 
-    // Checking whether customer exists
     private Customer fetchCustomer(String email) {
-
         return customerRepository.findByEmail(email).orElseThrow(
                 () -> new RuntimeException(String.format("Customer with email %s not found.", email))
         );
     }
 
-    // Support methods
-    private Customer toCustomer(CustomerSignUpDTO dto) {
-        String encodedPassword = passwordEncoder.encode(dto.password());
-
-        Customer customer = Customer
-                .builder()
+    private Customer toCustomer(CustomerSignUpDto dto) {
+        Customer customer = Customer.builder()
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
-                .password(encodedPassword)
+                .password(passwordEncoder.encode(dto.password()))
                 .build();
 
-        Account account = Account
-                .builder()
-                .IBAN(accountNumberGenerator.generateAccountNumber())
-                .currentBalance(BigDecimal.ZERO)
+        Account account = Account.builder()
+                .number(accountNumberGenerator.generateAccountNumber())
+                .balance(BigDecimal.ZERO)
+                .owner(customer)
+                .type(AccountType.CHECKING)
                 .build();
 
-        customer.addAccount(account);
+        accountRepository.save(account);
 
         return customer;
     }
 
-    private CustomerResponseDTO toCustomerResponseDTO(Customer customer) {
-        return new CustomerResponseDTO(customer.getEmail(), customer.getFirstName(), customer.getLastName());
+    private CustomerResponseDto toCustomerResponseDTO(Customer customer) {
+        return new CustomerResponseDto(
+                customer.getEmail(),
+                customer.getFirstName(),
+                customer.getLastName()
+        );
     }
 }

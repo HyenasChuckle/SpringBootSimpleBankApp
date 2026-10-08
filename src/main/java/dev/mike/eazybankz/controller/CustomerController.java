@@ -1,9 +1,10 @@
 package dev.mike.eazybankz.controller;
 
-import dev.mike.eazybankz.dto.customer.CustomerResponseDTO;
-import dev.mike.eazybankz.dto.customer.CustomerSignUpDTO;
-import dev.mike.eazybankz.dto.customer.CustomerUpdateDTO;
+import dev.mike.eazybankz.dto.customer.CustomerResponseDto;
+import dev.mike.eazybankz.dto.customer.CustomerSignUpDto;
+import dev.mike.eazybankz.dto.customer.CustomerUpdateDto;
 import dev.mike.eazybankz.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/customers")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class CustomerController {
 
@@ -20,24 +22,24 @@ public class CustomerController {
 
     // CRUD - Create
     @PostMapping("/register")
-    public ResponseEntity<CustomerResponseDTO> registerCustomer(@RequestBody CustomerSignUpDTO dto) {
-        CustomerResponseDTO responseDto = customerService.create(dto);
+    public ResponseEntity<CustomerResponseDto> registerCustomer(@RequestBody @Valid CustomerSignUpDto dto) {
+        CustomerResponseDto responseDto = customerService.create(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     // CRUD - Read
     @GetMapping("/me")
-    public ResponseEntity<CustomerResponseDTO> getCustomer(Principal principal) {
-        CustomerResponseDTO responseDto = customerService.findByEmail(principal.getName());
+    public ResponseEntity<CustomerResponseDto> getCustomer(Principal principal) {
+        CustomerResponseDto responseDto = customerService.findByEmail(principal.getName());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // CRUD - Update
     @PutMapping("/update")
-    public ResponseEntity<CustomerResponseDTO> updateCustomer(@RequestBody CustomerUpdateDTO dto, Principal principal) {
-        CustomerResponseDTO responseDto = customerService.update(dto, principal.getName());
+    public ResponseEntity<CustomerResponseDto> updateCustomer(@RequestBody CustomerUpdateDto dto, Principal principal) {
+        CustomerResponseDto responseDto = customerService.update(dto, principal.getName());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

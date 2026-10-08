@@ -1,6 +1,6 @@
 package dev.mike.eazybankz.controller;
 
-import dev.mike.eazybankz.dto.account.AccountResponseDTO;
+import dev.mike.eazybankz.dto.account.AccountResponseDto;
 import dev.mike.eazybankz.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +19,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    public ResponseEntity<AccountResponseDTO> createAccount(Principal principal) {
-        AccountResponseDTO responseDto = accountService.create(principal.getName());
+    public ResponseEntity<AccountResponseDto> createAccount(Principal principal) {
+        AccountResponseDto responseDto = accountService.create(principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }

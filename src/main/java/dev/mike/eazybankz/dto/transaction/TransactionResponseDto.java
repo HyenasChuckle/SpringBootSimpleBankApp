@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record TransactionResponseDto(
-        TransactionType transactionType,
-        String sourceIBAN,
-        String receiverIBAN,
-        BigDecimal transactionAmount,
+        TransactionType type,
+        String sourceNumber,
+        String receiverNumber,
+        BigDecimal amount,
         LocalDateTime timestamp) {}
